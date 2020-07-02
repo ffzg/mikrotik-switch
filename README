@@ -21,5 +21,11 @@ dpavlin@black:~/mikrotik-switch$ ./export-backup.sh sw-dpc-2
 This will fetch switch config, add it to git and commit changes
 
 
+If you specify --all to export-backup.sh it will use existing files
+in backup/ directory to update all existing switch configurations,
+so you can add something like following entry to your cron:
+
+/home/dpavlin/mikrotik-switch/export-backup.sh --all
+
 
 
