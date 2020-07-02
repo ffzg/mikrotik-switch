@@ -1,0 +1,25 @@
+Dump configuration files from Mikrotik switches to git repository using ssh
+
+
+See doc/1-ssh.txt for info how to install ssh keys
+
+
+Configuration:
+
+
+Create backup directory and init git in it:
+
+dpavlin@black:~/mikrotik-switch$ mkdir backup
+dpavlin@black:~/mikrotik-switch$ cd backup/
+dpavlin@black:~/mikrotik-switch/backup$ git init
+dpavlin@black:~/mikrotik-switch/backup$ cd ..
+
+Now run export-backup.sh for each switch that you have:
+
+dpavlin@black:~/mikrotik-switch$ ./export-backup.sh sw-dpc-2
+
+This will fetch switch config, add it to git and commit changes
+
+
+
+
