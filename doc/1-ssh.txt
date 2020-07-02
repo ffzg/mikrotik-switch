@@ -1,0 +1,18 @@
+# https://wiki.mikrotik.com/wiki/Using_SSH_for_system_backup
+
+dpavlin@black:~/mikrotik-switch$ ssh-keygen -f ssh/mikrotik
+
+dpavlin@black:~/mikrotik-switch$ ssh admin@sw-dpc-1
+
+# with master socket following command won't ask again for login
+
+dpavlin@black:~/mikrotik-switch$ scp ssh/mikrotik.pub admin@sw-dpc-1:
+
+[admin@sw-dpc-1] > /user ssh-keys import public-key-file=mikrotik.pub user=admin
+[admin@sw-dpc-1] > quit
+
+# test
+
+dpavlin@black:~/mikrotik-switch$ ssh -i ssh/mikrotik admin@sw-dpc-2
+
+
