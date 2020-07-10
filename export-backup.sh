@@ -9,7 +9,7 @@ cd $path
 
 # with --all use existing backups to update configuration
 if [ "$switch" = "--all" ] ; then
-	ls backup/ | sed 's/\.rsc$//' | xargs -i sh -xe $0 {}
+	ls backup/ | sed 's/\.rsc$//' | xargs -i sh -e $0 {}
 	exit 0
 fi
 
