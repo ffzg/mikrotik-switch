@@ -15,8 +15,10 @@ fi
 
 
 
-ssh -i $path/ssh/mikrotik admin@$switch 'export file="backup"'
-scp -q -i $path/ssh/mikrotik admin@$switch:backup.rsc $path/backup/$switch.rsc
+#ssh -i $path/ssh/mikrotik admin@$switch 'export file="backup"'
+#scp -q -i $path/ssh/mikrotik admin@$switch:backup.rsc $path/backup/$switch.rsc
+
+ssh -i $path/ssh/mikrotik admin@$switch 'export terse' > $path/backup/$switch.rsc
 
 cd $path/backup
 git ls-files --error-unmatch $switch.rsc >/dev/null || ( git add $switch.rsc && git commit -m "$switch initial config" && exit 0 )
