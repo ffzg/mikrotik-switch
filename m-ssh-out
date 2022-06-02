@@ -1,0 +1,11 @@
+#!/bin/sh -e
+path=/home/dpavlin/mikrotik-switch
+
+test -z "$1" && echo "Usage: $0 sw-name" && exit 1
+
+switch=$1
+shift
+
+name=$( echo $* | tr -d / )
+
+ssh -i $path/ssh/mikrotik admin@$switch $@ | tee "out/$switch.$name"
