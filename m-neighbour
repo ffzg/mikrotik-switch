@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+cd /home/dpavlin/mikrotik-switch
+./m-hostnames | xargs -i ./m-ssh-out {} '/ip neighbor print detail terse'
+
+cd /home/dpavlin/mikrotik-switch/out
+ls *neighbor* | while read file ; do
+	echo "# $file"
+	cat "$file" | sed 's/^ *[0-9]* //' | tr -d \r | sort > "$file.2"
+	mv "$file.2" "$file"
+	git commit -m "$file" "$file" || true
+done
