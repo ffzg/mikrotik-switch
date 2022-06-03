@@ -6,7 +6,7 @@ cd /home/dpavlin/mikrotik-switch
 cd /home/dpavlin/mikrotik-switch/out
 ls *neighbor* | while read file ; do
 	echo "# $file"
-	cat "$file" | sed 's/^ *[0-9]* //' | tr -d \r | sort > "$file.2"
+	cat "$file" | sed 's/^ *[0-9]* //' | tr -d '\r' | sort > "$file.2"
 	mv "$file.2" "$file"
 	git commit -m "$file" "$file" || true
 done
