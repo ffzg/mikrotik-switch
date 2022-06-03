@@ -1,0 +1,9 @@
+#!/bin/sh
+path=/home/dpavlin/mikrotik-switch
+
+test -z "$1" && echo "Usage: $0 sw-name" && exit 1
+
+switch=$1
+
+yes | head -16 | cat -n | awk '{ print $1 }' | xargs -i echo "/interface ethernet monitor sfp-sfpplus{} once without-paging" | \
+ssh -i $path/ssh/mikrotik admin@$switch | tee out/$switch.sfp
