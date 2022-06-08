@@ -1,0 +1,13 @@
+#!/bin/sh -e
+path=/home/dpavlin/mikrotik-switch
+
+# search on switch for other switch by name
+test -z "$1" && echo "Usage: $0 sw-dpc-2 sw-fond" && exit 1
+
+switch=$1
+find=$2
+
+mac=$( grep $find /dev/shm/sw-ip-name-mac | tee /dev/stderr | awk '{ print $3 }' | tr a-f A-F )
+echo "# $mac"
+
+ssh -i $path/ssh/mikrotik admin@$switch "interface bridge host print where mac-address=$mac"
