@@ -2,6 +2,8 @@
 use warnings;
 use strict;
 
+chdir '/home/dpavlin/mikrotik-switch';
+
 foreach my $sw ( glob 'backup/*' ) {
 	open(my $fh, '<', $sw);
 	$sw =~ s{\w+/}{};
