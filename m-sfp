@@ -8,3 +8,5 @@ switch=$1
 #yes | head -16 | cat -n | awk '{ print $1 }' | xargs -i echo "/interface ethernet monitor sfp-sfpplus{} once without-paging" | \
 echo '/interface ethernet; :foreach i in=([find default-name~"sfp"]) do={monitor [get $i default-name] once without-paging}' | \
 ssh -i $path/ssh/mikrotik admin@$switch | tee out/$switch.sfp
+
+git -C out commit -m $( date +%Y-%m-%d ) -a
