@@ -1,0 +1,39 @@
+# add default route to black
+
+/ip route add dst-address=0.0.0.0/0 gateway=10.20.0.216
+
+# setup dns
+
+/ip dns set servers=10.20.0.200
+
+# check for new version
+
+/system package update check-for-updates 
+            channel: stable
+  installed-version: 6.46.4
+     latest-version: 6.49.6
+             status: New version is available
+
+# list versions
+
+/system package print 
+
+# upgrade
+
+/system package update download 
+            channel: stable
+  installed-version: 6.46.4
+     latest-version: 6.49.6
+             status: Downloaded, please reboot router to upgrade it
+
+
+/system reboot 
+
+~ 70s
+
+# upgrade firmware
+
+/system routerboard upgrade 
+Do you really want to upgrade firmware? [y/n] 
+
+~ 60 sec.
