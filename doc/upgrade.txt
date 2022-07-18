@@ -37,3 +37,23 @@
 Do you really want to upgrade firmware? [y/n] 
 
 ~ 60 sec.
+
+# disable packages
+
+[admin@sw-a125a] > /system package print
+Flags: X - disabled
+ #   NAME                                                VERSION                                                SCHEDULED
+ 0   routeros-mipsbe                                     6.49.6
+ 1   system                                              6.49.6
+ 2 X ipv6                                                6.49.6
+ 3   wireless                                            6.49.6
+ 4   hotspot                                             6.49.6
+ 5   mpls                                                6.49.6
+ 6   routing                                             6.49.6
+ 7   ppp                                                 6.49.6
+ 8   dhcp                                                6.49.6
+ 9   security                                            6.49.6
+10   advanced-tools                                      6.49.6
+
+[admin@sw-a125a] > /system package disable 3
+[admin@sw-a125a] > /system package disable 4
