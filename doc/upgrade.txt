@@ -57,3 +57,7 @@ Flags: X - disabled
 
 [admin@sw-a125a] > /system package disable 3
 [admin@sw-a125a] > /system package disable 4
+
+# leave only lldp as discovery protocol
+
+/ip neighbor discovery-settings set protocol=lldp
