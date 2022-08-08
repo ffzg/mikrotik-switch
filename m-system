@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+cd /home/dpavlin/mikrotik-switch
+./m-hostnames | xargs -i ./m-ssh-out {} \
+'/system routerboard print'
+#'/system package print'
+#'/system package update check-for-updates'
+
+cd /home/dpavlin/mikrotik-switch/out
+ls *system* | while read file ; do
+	echo "XXX> $file"
+	git add "$file"
+	git commit -m "$file" "$file" || true
+done
