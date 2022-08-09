@@ -53,37 +53,11 @@ my $buff;
 sub send_pty {
 	my $string = shift;
 
-	print STDERR "\n>>> ",dump($string), "\n";
+	print STDERR "\n>>> ",dump($string), "\n" if $debug;
 	syswrite $pty, $string;
 	$pty->flush;
-	return; # XXX
-
-	my $read_len = length($string);
-	sysread $pty, my $echo, length($string); 
-	print STDERR "\n<<< ",dump($echo), "\n";
-
-	# slurp character by character echo
-	foreach my $read_len ( 1 .. length($string) ) {
-		sysread $pty, $echo, $read_len;
-		print STDERR "\n<<< ",dump($echo), "\n";
-	}
-
-	print STDERR $echo;
-	$buff .= $echo;
-
-=for char-by-char
-	sleep 0.05; # we really need to wait for slow PowerConnect 5324
-	foreach (split //, $string) {
-		print STDERR "[$_]" if $debug;
-		syswrite $pty, $_;
-		#$pty->flush;
-		sleep 0.01;
-		sysread $pty, my $echo, 1;
-		print STDERR $echo;
-		$buff .= $echo;
-	}
-=cut
 }
+
 
 mkdir 'log' unless -d 'log';
 
@@ -124,16 +98,16 @@ while() {
 	$buff =~ s{\r\[[^\]]+\] > /.*?\s+\r}{\r}g && warn "\nXXX remove echo prompt\n";
 
 	if ( $buff =~ s/\s*\e\[K/ /s ) {
-		print STDERR "\nXXX ", Time::HiRes::time, " remove prompt echo buff=", dump( $buff ), "\n";
+		print STDERR "\nXXX ", Time::HiRes::time, " remove prompt echo buff=", dump( $buff ), "\n" if $debug;
 		
 
 	} elsif ( $buff =~ s/\s*\r\[\w+\@([\w\-]+)\]\s>\s// ) { # find prompt and remove it
 
 		my $hostname = $1;
-		print STDERR "\nXXX ", Time::HiRes::time, " prompt [$command] buff=", dump( $buff ), "\n";
+		print STDERR "\nXXX ", Time::HiRes::time, " prompt [$command] buff=", dump( $buff ), "\n" if $debug;
 
 		if ( $command && substr($command,0,length($buff)) eq $buff ) {
-			print STDERR "<";
+			print STDERR "<" if $debug;
 			$buff = '';
 			next; # read more
 		}
@@ -163,7 +137,7 @@ while() {
 		}
 	} elsif ( $buff =~ s{(\e\[\d+[a-zA-Z])}{} || $buff =~ s{(\eZ)}{} ) {
 		my $ansi = $1;
-		print STDERR "\nXXX ", Time::HiRes::time, " ANSI terminal detect?", dump( $ansi, $buff ), "\n";
+		print STDERR "\nXXX ", Time::HiRes::time, " ANSI terminal detect?", dump( $ansi, $buff ), "\n" if $debug;
 	} elsif ( $buff =~ s{^.+Use command at the base level\r\n\r}{}s ) {
 		warn "\nSTRIP banner", dump( $buff );
 	} elsif ( $buff =~ s{\Q--More-- or (q)uit\E}{} ) { # FIXME pager
@@ -173,6 +147,10 @@ while() {
 
 =for later
 
+=cut
+
+__DATA__
+/interface ethernet print
 /interface ethernet print detail without-paging
 /interface bridge print
 /ip address print
@@ -180,11 +158,6 @@ while() {
 /ip neighbor print detail terse
 /system health print
 /system package print
-/system package update check-for-updates
 /system routerboard print
+/system package update check-for-updates
 
-=cut
-
-__DATA__
-/interface ethernet print
-/interface bridge print
