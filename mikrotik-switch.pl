@@ -97,7 +97,7 @@ while() {
 	# [admin@sw-ganeti] >
         #                          [admin@sw-ganeti] >
 
-	$buff =~ s{\r\[[^\]]+\] > /.*?\s+\r}{\r}g && warn "\nXXX remove echo prompt\n";
+	$buff =~ s{\r\[[^\]]+\] > /.*?\s+\r}{\r}g && $debug && warn "\nXXX remove echo prompt\n";
 
 	if ( $buff =~ s/\s*\e\[K/ /s ) {
 		print STDERR "\nXXX ", Time::HiRes::time, " remove prompt echo buff=", dump( $buff ), "\n" if $debug;
@@ -142,7 +142,7 @@ while() {
 		print STDERR "\nXXX ", Time::HiRes::time, " ANSI terminal detect?", dump( $ansi, $buff ), "\n" if $debug;
 	} elsif ( $buff =~ s{^.+Use command at the base level\r\n\r}{}s ) {
 		warn "\nSTRIP banner", dump( $buff );
-	} elsif ( $buff =~ s{\Q--More-- or (q)uit\E}{} ) { # FIXME pager
+	} elsif ( $buff =~ s{\Q-- [Q quit|D dump|up|down]\E}{} ) { # FIXME pager
 		send_pty " ";
 	}
 }
