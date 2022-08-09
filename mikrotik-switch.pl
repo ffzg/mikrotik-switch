@@ -69,6 +69,8 @@ sub save_log {
 	return unless $command;
 	return if $ENV{NO_LOG};
 
+	$buff =~ s{$command\r\n\r}{};
+
 	$command =~ s{/}{}; # remote / in front of command
 
 	my $file = "${hostname}.${command}";
@@ -78,7 +80,7 @@ sub save_log {
 	close $log;
 	if ( -e '.git' ) {
 		system 'git', 'add', $file;
-		#system 'git', 'commit', '-m', "$ip $hostname", $file;
+		system 'git', 'commit', '-m', "$ip $hostname $command", $file;
 	}
 }
 
@@ -128,7 +130,7 @@ while() {
 
 		if ( $command = shift @commands_while ) {
 			$command =~ s/[\n\r]+$//;
-			send_pty "$command\r\n\r\n";
+			send_pty "$command\r\n";
 			$buff = '';
 		} else  {
 			send_pty "exit\n";
