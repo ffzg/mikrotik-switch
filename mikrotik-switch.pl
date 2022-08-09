@@ -30,7 +30,7 @@ if ( ! @commands && ! -t STDIN && -p STDIN ) { # we are being piped into
 # "e" 	on 	off 	Enables "dumb" terminal mode
 my $login = 'admin+dc200w';
 #my $login = 'admin+dc200w';
-my $login = 'admin+c';
+my $login = 'admin+cte';
 my $identity = '/home/dpavlin/mikrotik-switch/ssh/mikrotik';
 
 warn "\n## ssh -i $identity $login\@$ip\n";
@@ -52,17 +52,37 @@ my $buff;
 
 sub send_pty {
 	my $string = shift;
+
+	print STDERR "\n>>> ",dump($string), "\n";
+	syswrite $pty, $string;
+	$pty->flush;
+	return; # XXX
+
+	my $read_len = length($string);
+	sysread $pty, my $echo, length($string); 
+	print STDERR "\n<<< ",dump($echo), "\n";
+
+	# slurp character by character echo
+	foreach my $read_len ( 1 .. length($string) ) {
+		sysread $pty, $echo, $read_len;
+		print STDERR "\n<<< ",dump($echo), "\n";
+	}
+
+	print STDERR $echo;
+	$buff .= $echo;
+
+=for char-by-char
 	sleep 0.05; # we really need to wait for slow PowerConnect 5324
 	foreach (split //, $string) {
 		print STDERR "[$_]" if $debug;
 		syswrite $pty, $_;
 		#$pty->flush;
 		sleep 0.01;
-
 		sysread $pty, my $echo, 1;
 		print STDERR $echo;
 		$buff .= $echo;
 	}
+=cut
 }
 
 mkdir 'log' unless -d 'log';
@@ -93,7 +113,7 @@ my @commands_while = ( @commands );
 
 while() {
 	my $data;
-	my $read = sysread($pty, $data, 10); # XXX must be more than 1 to handle echo
+	my $read = sysread($pty, $data, 1); # XXX must be more than 1 to handle echo
 	print STDERR $data;
 	$buff .= $data;
 
@@ -103,20 +123,35 @@ while() {
 
 	$buff =~ s{\r\[[^\]]+\] > /.*?\s+\r}{\r}g && warn "\nXXX remove echo prompt\n";
 
-	if ( $buff =~ s/\e\[K\r[^\r]+\r//s ) {
+	if ( $buff =~ s/\s*\e\[K/ /s ) {
 		print STDERR "\nXXX ", Time::HiRes::time, " remove prompt echo buff=", dump( $buff ), "\n";
 		
 
-	} elsif ( $buff =~ s/\s*\r?\[\w+\@([\w\-]+)\]\s>\s$// ) { # find prompt and remove it
+	} elsif ( $buff =~ s/\s*\r\[\w+\@([\w\-]+)\]\s>\s// ) { # find prompt and remove it
 
 		my $hostname = $1;
-		print STDERR "\nXXX ", Time::HiRes::time, " prompt buff=", dump( $buff ), "\n";
-		if ( $buff ) {
+		print STDERR "\nXXX ", Time::HiRes::time, " prompt [$command] buff=", dump( $buff ), "\n";
+
+		if ( $command && substr($command,0,length($buff)) eq $buff ) {
+			print STDERR "<";
+			$buff = '';
+			next; # read more
+		}
+
+
+		if ( length $buff ) {
 			save_log $ip, $hostname, $command, $buff;
 			$buff = '';
+			undef $command;
 		} else {
-			next;
+
 		}
+
+		if ( $command ) {
+			print STDERR "<";
+			next; # read more
+		}
+
 		if ( $command = shift @commands_while ) {
 			$command =~ s/[\n\r]+$//;
 			send_pty "$command\r\n\r\n";
@@ -152,3 +187,4 @@ while() {
 
 __DATA__
 /interface ethernet print
+/interface bridge print
