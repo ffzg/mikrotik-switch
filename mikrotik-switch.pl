@@ -80,7 +80,7 @@ sub save_log {
 	close $log;
 	if ( -e '.git' ) {
 		system 'git', 'add', $file;
-		system 'git', 'commit', '-m', "$ip $hostname $command", $file;
+		system 'git', 'commit', '-m', "$ip $hostname $command", $file if ! $debug;
 	}
 }
 
@@ -149,6 +149,8 @@ while() {
 
 =for later
 
+/system package update check-for-updates
+
 =cut
 
 __DATA__
@@ -161,5 +163,4 @@ __DATA__
 /system health print
 /system package print
 /system routerboard print
-/system package update check-for-updates
 
