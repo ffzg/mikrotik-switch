@@ -9,3 +9,5 @@ shift
 name=$( echo $* | tr -d / )
 
 ssh -i $path/ssh/mikrotik admin@$switch $@ | tee "out/$switch.$name"
+git -C out add "$switch.$name"
+git -C out commit -m "$switch $name" "$switch.$name"
