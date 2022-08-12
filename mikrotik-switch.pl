@@ -3,13 +3,37 @@ use warnings;
 use strict;
 use autodie;
 
+# for single commands, ssh alone is much faster!
+# ./m-hostnames | xargs -i ./m-ssh-out {} '/interface bridge monitor 0 once'
+
 use Net::OpenSSH;
 use Data::Dump qw(dump);
 use Time::HiRes qw(sleep);
 
 our $debug = $ENV{DEBUG} || 0;
 
+our @pending_switches;
+
 my $ip = shift @ARGV || die "usage: $0 IP command[ command ...]\n";
+if ( $ip eq '--all' ) {
+	$ENV{NO_LOG} = 1;
+	@pending_switches = qw(
+sw-a121
+sw-a125a
+sw-a215
+sw-ganeti
+sw-dpc-1
+sw-dpc-2
+);
+
+}
+
+another_switch:
+if ( @pending_switches ) {
+	$ip = shift @pending_switches;
+	warn "XXX pending $ip";
+}
+
 $ip = $1 if `host $ip` =~ m/has address (\S+)/;
 my @commands = @ARGV;
 if ( ! @commands && ! -t STDIN && -p STDIN ) { # we are being piped into
@@ -146,6 +170,8 @@ while() {
 		send_pty " ";
 	}
 }
+
+goto another_switch if @pending_switches;
 
 =for later
 
