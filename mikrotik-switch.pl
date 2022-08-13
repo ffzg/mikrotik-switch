@@ -34,7 +34,15 @@ if ( @pending_switches ) {
 	warn "XXX pending $ip";
 }
 
-$ip = $1 if `host $ip` =~ m/has address (\S+)/;
+my $login;
+if ( $ip =~ s/^(\w+)\@// ) {
+	$login = $1;
+	$ip =~ s{^\@}{} && warn "## @";
+	warn "# strip login $login from switch name $ip";
+}
+
+#$ip = $1 if `host $ip` =~ m/has address (\S+)/;
+
 my @commands = @ARGV;
 if ( ! @commands && ! -t STDIN && -p STDIN ) { # we are being piped into
 	while(<>) {
@@ -52,9 +60,13 @@ if ( ! @commands && ! -t STDIN && -p STDIN ) { # we are being piped into
 # "c" 	on 	off 	disable/enable console colors
 # "t" 	on 	off 	Do auto detection of terminal capabilities
 # "e" 	on 	off 	Enables "dumb" terminal mode
-my $login = 'admin+dc200w';
 #my $login = 'admin+dc200w';
-my $login = 'admin+cte';
+#my $login = 'admin+dc200w';
+$login ||= 'admin+cte';
+if ( $login !~ m/\+cte$/ ) {
+	$login .= '+cte';
+	warn "XXX login $login";
+}
 my $identity = '/home/dpavlin/mikrotik-switch/ssh/mikrotik';
 
 warn "\n## ssh -i $identity $login\@$ip\n";
@@ -109,6 +121,12 @@ sub save_log {
 }
 
 my $command;
+
+READ_STDIN:
+if ( -t STDIN ) {
+	warn "<<< commands, one in line: <ctrl+d> to end";
+	@commands = <STDIN>;
+}
 my @commands_while = ( @commands );
 
 while() {
@@ -170,6 +188,8 @@ while() {
 		send_pty " ";
 	}
 }
+
+goto READ_STDIN if -t STDIN;
 
 goto another_switch if @pending_switches;
 
