@@ -3,11 +3,19 @@ path=/home/dpavlin/mikrotik-switch
 
 test -z "$1" && echo "Usage: $0 sw-name" && exit 1
 
-switch=$1
+login_switch=$1
 shift
+
+if echo $login_switch | grep @ ; then
+	sw_login=$( echo $login_switch | cut -d@ -f1 )
+	switch=$( echo $login_switch | cut -d@ -f2 )
+else
+	sw_login=admin
+	switch=$login_switch
+fi
 
 name=$( echo $* | tr -d / )
 
-ssh -i $path/ssh/mikrotik admin@$switch $@ | tee "out/$switch.$name"
+ssh -i $path/ssh/mikrotik -l $sw_login $login_switch $@ | tee "out/$switch.$name"
 git -C out add "$switch.$name"
 git -C out commit -m "$switch $name" "$switch.$name"
