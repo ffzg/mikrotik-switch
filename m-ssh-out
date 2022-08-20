@@ -16,6 +16,6 @@ fi
 
 name=$( echo $* | tr -d / )
 
-ssh -i $path/ssh/mikrotik -l $sw_login $login_switch $@ | tee "out/$switch.$name"
-git -C out add "$switch.$name"
-git -C out commit -m "$switch $name" "$switch.$name"
+ssh -i $path/ssh/mikrotik -l $sw_login $login_switch $@ | tee "$path/out/$switch.$name"
+git -C $path/out add "$switch.$name"
+git -C $path/out commit -m "$switch $name" "$switch.$name"
