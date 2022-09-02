@@ -12,6 +12,7 @@ foreach my $sw ( glob('backup/*.rsc'), glob('../tilera/backup/backup.rsc') ) {
 	while(<$fh>) {
 		chomp;
 		if ( m/vlan-ids?=(\d+)/ ) {
+			next if m/disabled=yes/;
 			my $vlan = $1;
 			my $ports;
 			if ( m/tagged-ports=(\S+)/ ) {
