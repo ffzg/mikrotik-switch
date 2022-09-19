@@ -16,6 +16,10 @@ fi
 
 name=$( echo $* | tr -d / )
 
+if [ "$login_switch" = "sw-core" ] ; then
+ssh -i /home/dpavlin/.ssh/mtik/enesej -l enesej $login_switch $@ | tee "$path/out/$switch.$name"
+else
 ssh -i $path/ssh/mikrotik -l $sw_login $login_switch $@ | tee "$path/out/$switch.$name"
+fi
 git -C $path/out add "$switch.$name"
 git -C $path/out commit -m "$switch $name" "$switch.$name"
