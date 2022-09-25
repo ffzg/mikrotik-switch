@@ -39,6 +39,9 @@ foreach my $sw ( glob('backup/*.rsc'), glob('../tilera/backup/backup.rsc') ) {
 			} elsif ( $ports ) {
 				print "$sw $ports $vlan\n";
 			}
+		} elsif ( m/interface=(.*) (pvid=\d+)/ ) {
+			print "$sw $1 $2\n";
 		}
+
 	}
 }
