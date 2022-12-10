@@ -1,0 +1,9 @@
+#!/bin/sh -e
+
+cd /home/dpavlin/mikrotik-switch
+( echo sw-core ; ./m-hostnames ) | xargs -i ./m-ssh-out {} '/system health print'
+
+cd /home/dpavlin/mikrotik-switch/out
+ls *health* | while read file ; do
+	git commit -m "$file" "$file" || true
+done
