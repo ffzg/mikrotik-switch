@@ -1,12 +1,20 @@
-#!/bin/sh
+#!/bin/sh -ex
 path=/home/dpavlin/mikrotik-switch
 
-test -z "$1" && echo "Usage: $0 sw-name" && exit 1
+#test -z "$1" && echo "Usage: $0 sw-name" && exit 1
+if [ -z "$1" ] ; then
+	ls out/*.sfp | sed -e 's,out/,,' -e 's/.sfp//' | xargs -i $0 {}
+	exit 0
+fi
 
 switch=$1
+
+./m-ssh-out $switch '/interface ethernet; :foreach i in=([find default-name~"sfp"]) do={monitor [get $i default-name] once without-paging}' | tee out/$switch.sfp
+git -C out commit -m $( date +%Y-%m-%d ) $switch.sfp
+
+exit 0 # FIXME
 
 #yes | head -16 | cat -n | awk '{ print $1 }' | xargs -i echo "/interface ethernet monitor sfp-sfpplus{} once without-paging" | \
 echo '/interface ethernet; :foreach i in=([find default-name~"sfp"]) do={monitor [get $i default-name] once without-paging}' | \
 ssh -i $path/ssh/mikrotik admin@$switch | tee out/$switch.sfp
 
-git -C out commit -m $( date +%Y-%m-%d ) -a
