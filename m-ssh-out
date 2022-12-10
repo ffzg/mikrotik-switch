@@ -15,6 +15,7 @@ else
 fi
 
 name=$( echo $* | tr -d / )
+test ! -z "$OUT_NAME" && name=$OUT_NAME
 
 if [ "$login_switch" = "sw-core" ] ; then
 ssh -i /home/dpavlin/.ssh/mtik/enesej -l enesej $login_switch $@ | tee "$path/out/$switch.$name"
