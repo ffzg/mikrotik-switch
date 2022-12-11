@@ -9,6 +9,10 @@ fi
 
 switch=$1
 
+OUT_NAME=sfp ./m-ssh-out $switch '/interface ethernet; :foreach i in=([find default-name~"sfp"]) do={monitor [get $i name] once without-paging}'
+
+exit 0
+
 OUT_NAME=sfp ./m-ssh-out $switch '/interface ethernet; :foreach i in=([find default-name~"sfp"]) do={monitor [get $i default-name] once without-paging}'
 
 exit 0 # XXX remove below
